@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+    <rect width="1200" height="630" fill="#FAF9F6"/>
+    <circle cx="150" cy="100" r="220" fill="#4C8B6E" fill-opacity="0.1"/>
+    <circle cx="1050" cy="520" r="250" fill="#E08E79" fill-opacity="0.12"/>
+    <rect x="80" y="80" width="1040" height="470" rx="32" fill="#FFFFFF" stroke="#E8F2ED" stroke-width="3"/>
+    <rect x="130" y="135" width="64" height="64" rx="16" fill="#4C8B6E"/>
+    <text x="162" y="179" font-family="sans-serif" font-size="34" font-weight="bold" fill="#FFFFFF" text-anchor="middle">C</text>
+    <text x="215" y="178" font-family="sans-serif" font-size="32" font-weight="bold" fill="#1F2933">Cantika Gustiani.</text>
+    <text x="130" y="275" font-family="sans-serif" font-size="48" font-weight="bold" fill="#1F2933">Full-Stack Web Developer</text>
+    <text x="130" y="335" font-family="sans-serif" font-size="36" font-weight="bold" fill="#4C8B6E">Laravel • React • AI &amp; Automation</text>
+    <text x="130" y="405" font-family="sans-serif" font-size="24" fill="#52606D">Portofolio Proyek &amp; Layanan Jasa Pembuatan Website Freelance</text>
+    <rect x="130" y="450" width="340" height="50" rx="12" fill="#E8F2ED"/>
+    <text x="300" y="482" font-family="sans-serif" font-size="20" font-weight="bold" fill="#4C8B6E" text-anchor="middle">github.com/gstianichn</text>
+</svg>
