@@ -64,8 +64,50 @@ Mengusung konsep desain **Warm Sage & Glass** (*Warm Cream, Sage Emerald, Soft T
 
 ## Pengujian Otomatis (PHPUnit)
 
-Jalankan seluruh *Feature Test* (uji halaman utama, unduh CV, kirim email kontak, validasi input, dan blokir spam honeypot):
+Jalankan seluruh *Feature Test* (uji halaman utama, unduh CV, kirim email kontak, validasi input, blokir spam honeypot, serta export statis GitHub Pages):
 
 ```bash
 php artisan test
 ```
+
+---
+
+## Cara Deploy ke GitHub Pages (Menggunakan Branch `deploy`)
+
+Proyek ini sudah dilengkapi **Static Site Exporter** (`php artisan portfolio:export-static`) dan **GitHub Actions Workflow** (`.github/workflows/deploy-pages.yml`) agar Anda bisa men-*deploy* ke **`https://gstianichn.github.io`** menggunakan metode **Deploy from a branch (`deploy`)**.
+
+### Langkah 1: Buat Repository & Push Source Code ke Branch `main`
+1. Buat repository publik di GitHub dengan nama **`gstianichn.github.io`**.
+2. Jalankan perintah berikut di terminal proyek (`d:\laravel\portofolio`):
+   ```bash
+   git init
+   git add .
+   git commit -m "feat: initial web portfolio Cantika Gustiani"
+   git branch -M main
+   git remote add origin https://github.com/gstianichn/gstianichn.github.io.git
+   git push -u origin main
+   ```
+
+### Langkah 2: Aktifkan Izin Workflow & Branch `deploy` di GitHub
+1. Buka repository di GitHub → **Settings → Actions → General** → bagian *Workflow permissions*, pilih **Read and write permissions** lalu klik **Save**.
+2. Tunggu 1–2 menit hingga workflow **Deploy Portfolio to GitHub Pages (branch deploy)** di tab **Actions** selesai (centang hijau). Workflow ini otomatis membuat dan mengisi branch **`deploy`** dengan file statis (`index.html`, `build/`, `images/`, `cv/`).
+3. Buka **Settings → Pages → Build and deployment**:
+   - **Source:** Pilih **Deploy from a branch**
+   - **Branch:** Pilih **`deploy`** dan folder **`/ (root)`**, lalu klik **Save**.
+4. Website Anda akan langsung aktif di **`https://gstianichn.github.io`**.
+
+### Langkah 3 (Opsional tapi Disarankan): Aktifkan Pengiriman Email Form Kontak
+Agar pesan dari formulir kontak di GitHub Pages langsung masuk ke inbox `gstianichan.dev@gmail.com` tanpa membuka aplikasi email:
+1. Kunjungi [web3forms.com](https://web3forms.com/), masukkan `gstianichan.dev@gmail.com`, lalu salin **Access Key** yang dikirim ke email Anda.
+2. Di repository GitHub, buka **Settings → Secrets and variables → Actions → New repository secret**:
+   - **Name:** `WEB3FORMS_ACCESS_KEY`
+   - **Secret:** *(tempel Access Key dari Web3Forms)*
+3. Jalankan ulang workflow di tab **Actions** (atau lakukan `git push` baru ke `main`).
+
+### Build & Uji Versi Statis di Lokal
+Anda juga bisa membuat folder `dist/` secara manual di komputer lokal kapan saja:
+```bash
+npm.cmd run build
+php artisan portfolio:export-static
+```
+

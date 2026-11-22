@@ -92,4 +92,24 @@ class PortfolioTest extends TestCase
         $response->assertSessionHasErrors(['website_hp']);
         Mail::assertNothingSent();
     }
+
+    public function test_static_portfolio_export_command_generates_dist_files(): void
+    {
+        $outputDir = base_path('dist_test');
+
+        $this->artisan('portfolio:export-static', ['--output' => 'dist_test'])
+            ->assertExitCode(0);
+
+        $this->assertFileExists($outputDir . DIRECTORY_SEPARATOR . 'index.html');
+        $this->assertFileExists($outputDir . DIRECTORY_SEPARATOR . '404.html');
+        $this->assertFileExists($outputDir . DIRECTORY_SEPARATOR . '.nojekyll');
+        $this->assertFileExists($outputDir . DIRECTORY_SEPARATOR . 'cv' . DIRECTORY_SEPARATOR . 'CV-Cantika-Gustiani.pdf');
+
+        $html = file_get_contents($outputDir . DIRECTORY_SEPARATOR . 'index.html');
+        $this->assertStringContainsString('Cantika Gustiani', $html);
+        $this->assertStringContainsString('./cv/CV-Cantika-Gustiani.pdf', $html);
+        $this->assertStringContainsString('submitStaticForm', $html);
+
+        \Illuminate\Support\Facades\File::deleteDirectory($outputDir);
+    }
 }

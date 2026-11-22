@@ -13,8 +13,8 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Cantika Gustiani — Full-Stack Web Developer & Freelance Services">
     <meta property="og:description" content="Jelajahi portofolio proyek web aplikasi dan pilihan paket jasa pembuatan website untuk mahasiswa, UMKM, sekolah, dan instansi.">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ asset('images/og-preview.png') }}">
+    <meta property="og:url" content="{{ config('portfolio.static_form.enabled', false) ? rtrim(config('app.url', 'https://gstianichn.github.io/portfolio'), '/') . '/' : url()->current() }}">
+    <meta property="og:image" content="{{ config('portfolio.static_form.enabled', false) ? rtrim(config('app.url', 'https://gstianichn.github.io/portfolio'), '/') . '/images/og-preview.svg' : asset('images/og-preview.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

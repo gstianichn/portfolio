@@ -1,5 +1,12 @@
 @extends('layouts.app')
 
+@php
+    $isStatic = config('portfolio.static_form.enabled', false);
+    $cvHref = $isStatic ? './cv/CV-Cantika-Gustiani.pdf' : route('cv.download');
+    $web3formsKey = config('portfolio.static_form.web3forms_key', '');
+    $formspreeUrl = config('portfolio.static_form.formspree_url', '');
+@endphp
+
 @section('content')
     <!-- 4.2 HERO SECTION -->
     <section class="relative pt-10 pb-20 md:pt-16 md:pb-28 overflow-hidden">
@@ -47,7 +54,8 @@
                         </a>
 
                         <a
-                            href="{{ route('cv.download') }}"
+                            href="{{ $cvHref }}"
+                            @if ($isStatic) download="CV-Cantika-Gustiani.pdf" @endif
                             class="inline-flex items-center gap-2.5 rounded-xl glass-card px-6 py-3.5 text-sm sm:text-base font-semibold text-charcoal hover:border-sage-emerald hover:text-sage-emerald hover:-translate-y-0.5 transition-all"
                         >
                             <svg class="w-4 h-4 text-sage-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,7 +445,8 @@
                             <p class="text-xs font-bold uppercase tracking-wider text-soft-terracotta">Untuk HRD &amp; Rekruter</p>
                             <p class="text-sm text-charcoal font-semibold mt-1">Butuh dokumen CV lengkap dalam format PDF?</p>
                             <a
-                                href="{{ route('cv.download') }}"
+                                href="{{ $cvHref }}"
+                                @if ($isStatic) download="CV-Cantika-Gustiani.pdf" @endif
                                 class="mt-3 inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-sage-emerald hover:text-sage-emerald-dark"
                             >
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -478,8 +487,125 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('contact.send') }}" method="POST" class="mt-6 space-y-5">
-                            @csrf
+                        <div
+                            @if ($isStatic)
+                                x-data="{
+                                    isSubmitting: false,
+                                    staticSuccess: '',
+                                    staticError: '',
+                                    web3formsKey: @js($web3formsKey),
+                                    formspreeUrl: @js($formspreeUrl),
+                                    ownerEmail: @js($owner['email']),
+                                    async submitStaticForm(event) {
+                                        const form = event.target;
+                                        const formData = new FormData(form);
+                                        if ((formData.get('website_hp') || '').toString().trim() !== '') {
+                                            this.staticError = 'Aktivitas spam terdeteksi.';
+                                            return;
+                                        }
+
+                                        const name = (formData.get('name') || '').toString().trim();
+                                        const email = (formData.get('email') || '').toString().trim();
+                                        const subject = (formData.get('subject') || '').toString().trim();
+                                        const message = (formData.get('message') || '').toString().trim();
+
+                                        this.staticSuccess = '';
+                                        this.staticError = '';
+
+                                        if (name.length < 2 || !email || message.length < 10) {
+                                            this.staticError = 'Mohon lengkapi nama, email valid, dan pesan minimal 10 karakter.';
+                                            return;
+                                        }
+
+                                        // Option 1: Web3Forms API
+                                        if (this.web3formsKey) {
+                                            this.isSubmitting = true;
+                                            try {
+                                                const res = await fetch('https://api.web3forms.com/submit', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        access_key: this.web3formsKey,
+                                                        subject: `[Portofolio Cantika] ${subject} — dari ${name}`,
+                                                        from_name: name,
+                                                        replyto: email,
+                                                        name,
+                                                        email,
+                                                        keperluan: subject,
+                                                        message,
+                                                    }),
+                                                });
+                                                const data = await res.json();
+                                                if (data.success) {
+                                                    this.staticSuccess = `Terima kasih, ${name}! Pesan Anda mengenai '${subject}' telah terkirim ke email saya.`;
+                                                    form.reset();
+                                                } else {
+                                                    this.staticError = data.message || 'Gagal mengirim pesan. Silakan hubungi langsung melalui email.';
+                                                }
+                                            } catch (err) {
+                                                this.staticError = 'Terjadi gangguan jaringan. Silakan kirim langsung ke ' + this.ownerEmail;
+                                            } finally {
+                                                this.isSubmitting = false;
+                                            }
+                                            return;
+                                        }
+
+                                        // Option 2: Formspree Endpoint
+                                        if (this.formspreeUrl) {
+                                            this.isSubmitting = true;
+                                            try {
+                                                const res = await fetch(this.formspreeUrl, {
+                                                    method: 'POST',
+                                                    headers: { 'Accept': 'application/json' },
+                                                    body: formData,
+                                                });
+                                                if (res.ok) {
+                                                    this.staticSuccess = `Terima kasih, ${name}! Pesan Anda mengenai '${subject}' telah terkirim.`;
+                                                    form.reset();
+                                                } else {
+                                                    this.staticError = 'Gagal mengirim pesan melalui Formspree. Silakan coba lagi.';
+                                                }
+                                            } catch (err) {
+                                                this.staticError = 'Terjadi gangguan jaringan. Silakan kirim langsung ke ' + this.ownerEmail;
+                                            } finally {
+                                                this.isSubmitting = false;
+                                            }
+                                            return;
+                                        }
+
+                                        // Fallback: Mailto draft with prefilled subject & message
+                                        const mailSubject = encodeURIComponent(`[Portofolio Cantika] ${subject} — ${name}`);
+                                        const mailBody = encodeURIComponent(`Halo Cantika,\n\nNama: ${name}\nEmail: ${email}\nKeperluan: ${subject}\n\nPesan:\n${message}`);
+                                        window.location.href = `mailto:${this.ownerEmail}?subject=${mailSubject}&body=${mailBody}`;
+                                        this.staticSuccess = 'Aplikasi email Anda sedang dibuka dengan draf pesan siap kirim ke ' + this.ownerEmail;
+                                    }
+                                }"
+                            @endif
+                        >
+                            @if ($isStatic)
+                                <div x-cloak x-show="staticSuccess" class="mt-5 rounded-2xl bg-sage-emerald-light border border-sage-emerald/30 p-4 flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-sage-emerald shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <p class="text-xs sm:text-sm font-medium text-charcoal" x-text="staticSuccess"></p>
+                                </div>
+                                <div x-cloak x-show="staticError" class="mt-5 rounded-2xl bg-soft-terracotta-light border border-soft-terracotta/40 p-4 flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-soft-terracotta shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <p class="text-xs sm:text-sm font-medium text-charcoal" x-text="staticError"></p>
+                                </div>
+                            @endif
+
+                        <form
+                            action="{{ $isStatic ? '#' : route('contact.send') }}"
+                            method="POST"
+                            @if ($isStatic) @submit.prevent="submitStaticForm($event)" @endif
+                            class="mt-6 space-y-5"
+                        >
+                            @if (!$isStatic)
+                                @csrf
+                            @endif
 
                             <!-- Honeypot Field (Hidden from real users to catch spam bots) -->
                             <div class="hidden" aria-hidden="true">
@@ -574,15 +700,21 @@
                                 </p>
                                 <button
                                     type="submit"
+                                    @if ($isStatic) :disabled="isSubmitting" :class="isSubmitting ? 'opacity-70 cursor-not-allowed' : ''" @endif
                                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-sage-emerald px-7 py-3.5 text-sm font-bold text-white shadow-md hover:bg-sage-emerald-dark hover:-translate-y-0.5 transition-all cursor-pointer"
                                 >
-                                    <span>Kirim Pesan</span>
+                                    @if ($isStatic)
+                                        <span x-text="isSubmitting ? 'Mengirim...' : 'Kirim Pesan'">Kirim Pesan</span>
+                                    @else
+                                        <span>Kirim Pesan</span>
+                                    @endif
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                     </svg>
                                 </button>
                             </div>
                         </form>
+                        </div>
                     </div>
                 </div>
             </div>

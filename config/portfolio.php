@@ -151,4 +151,10 @@ return [
         'Tawaran Kerja/Magang' => 'Tawaran Kerja / Magang (HRD & Recruiter)',
         'Lainnya' => 'Pertanyaan / Keperluan Lainnya',
     ],
+
+    'static_form' => [
+        'enabled' => env('PORTFOLIO_STATIC_EXPORT', false),
+        'web3forms_key' => env('WEB3FORMS_ACCESS_KEY', ''),
+        'formspree_url' => env('FORMSPREE_ENDPOINT', ''),
+    ],
 ];

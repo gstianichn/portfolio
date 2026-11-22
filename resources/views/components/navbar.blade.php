@@ -1,5 +1,10 @@
 @props(['owner'])
 
+@php
+    $isStatic = config('portfolio.static_form.enabled', false);
+    $cvHref = $isStatic ? './cv/CV-Cantika-Gustiani.pdf' : route('cv.download');
+@endphp
+
 <header
     x-data="{ mobileMenuOpen: false, scrolled: false }"
     @scroll.window="scrolled = (window.pageYOffset > 20)"
@@ -37,7 +42,8 @@
             <!-- Desktop CTA Button (Unduh CV) -->
             <div class="hidden md:flex items-center gap-3">
                 <a
-                    href="{{ route('cv.download') }}"
+                    href="{{ $cvHref }}"
+                    @if ($isStatic) download="CV-Cantika-Gustiani.pdf" @endif
                     class="inline-flex items-center gap-2 rounded-xl bg-sage-emerald px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sage-emerald-dark focus:outline-none focus:ring-2 focus:ring-sage-emerald/40 transition-all"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +115,8 @@
             </a>
             <div class="pt-2 border-t border-sage-emerald/15">
                 <a
-                    href="{{ route('cv.download') }}"
+                    href="{{ $cvHref }}"
+                    @if ($isStatic) download="CV-Cantika-Gustiani.pdf" @endif
                     class="flex w-full items-center justify-center gap-2 rounded-xl bg-sage-emerald px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sage-emerald-dark transition-colors"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
