@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import 'tailwindcss';
+@import 'aos/dist/aos.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-warm-cream: #FAF9F6;
+    --color-sage-emerald: #4C8B6E;
+    --color-sage-emerald-dark: #3B7057;
+    --color-sage-emerald-light: #E8F2ED;
+    --color-soft-terracotta: #E08E79;
+    --color-soft-terracotta-light: #FDF1EE;
+    --color-charcoal: #1F2933;
+    --color-slate-muted: #52606D;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        background-color: var(--color-warm-cream);
+        color: var(--color-charcoal);
+        font-family: var(--font-sans);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+    }
+}
+
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.glass-navbar {
+    background-color: rgba(250, 249, 246, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(76, 139, 110, 0.12);
+}
+
+[x-cloak] {
+    display: none !important;
+}
